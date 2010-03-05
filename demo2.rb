@@ -171,12 +171,14 @@ def make_it_so
     reachable_states = {current_state => [0,nil,nil]}
     front = neighbors(current_state).collect { |n,op| [n,cost(current_state,n),current_state,op] }
     op = x = nil
-    while (front = front.sort_by { |x| x[1] }; x,c,b,op = front.shift) and x do
+    while (x,c,b,op = front.shift) and x do
+        #p front.size
         next if reachable_states.include? x
         #puts op.join(':')
         reachable_states[x] = [c,b,op]
         break if (0...(state_dimensions.length)).all? { |i| !goal[i] or x[i] == goal[i] }
-        front += neighbors(x).collect { |n,op| [n,c+cost(x,n),x,op] }
+        front += neighbors(x).collect { |n,op| [n,c+cost(x,n),x,op] unless reachable_states.include? n }.compact
+        front = front.sort_by { |x| x[1] }
     end
     puts "#{reachable_states.length} reachable states:"
     #reachable_states.to_a.sort_by {|s,cbop| cbop[0]}.each { |s,cbop|
